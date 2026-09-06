@@ -8,7 +8,8 @@ import styles from './index.module.css';
 
 /**
  * Legend display settings derived from the Series. */
-interface LegendSeriesItem extends Pick<InternalSeriesConfig, 'id' | 'name' | '_resolvedColor' | 'variant'> {}
+interface LegendSeriesItem
+  extends Pick<InternalSeriesConfig, 'id' | 'name' | '_resolvedColor' | 'variant' | 'opacity'> {}
 
 /**
  * Props for the Legend component.
@@ -59,19 +60,21 @@ interface LegendSwatchProps {
   variant?: LineSeriesVariant;
   /** Explicit swatch color; falls back to the palette color for this item's position. */
   color?: string;
+  /** Series opacity, applied to the swatch to match the chart (e.g. bar chart comparison period). */
+  opacity?: number;
 }
 
 function LegendSwatch(props: LegendSwatchProps) {
-  const { variant = 'solid', color: colorOverride } = props;
+  const { variant = 'solid', color: colorOverride, opacity } = props;
   const allocatedColor = useChartColor();
   const color = colorOverride ?? allocatedColor;
 
   if (variant === 'solid') {
-    return <Box rounding="full" className={styles.swatch} style={{ backgroundColor: color }} />;
+    return <Box rounding="full" className={styles.swatch} style={{ backgroundColor: color, opacity }} />;
   }
 
   return (
-    <svg className={styles.lineSwatch} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <svg className={styles.lineSwatch} viewBox="0 0 16 16" aria-hidden="true" focusable="false" style={{ opacity }}>
       <line
         x1="0"
         y1="8"
@@ -94,7 +97,7 @@ function LegendItem(props: LegendItemProps) {
   const { seriesItem } = props;
   return (
     <Flex role="listitem" direction="row" alignItems="center" gap="sm" className={styles.item}>
-      <LegendSwatch variant={seriesItem.variant} color={seriesItem._resolvedColor} />
+      <LegendSwatch variant={seriesItem.variant} color={seriesItem._resolvedColor} opacity={seriesItem.opacity} />
       <Text>{seriesItem.name}</Text>
     </Flex>
   );

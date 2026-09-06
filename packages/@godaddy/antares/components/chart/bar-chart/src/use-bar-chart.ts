@@ -8,6 +8,7 @@ import {
   computeBarGroupSpacing,
   createTickFormatter,
   computeTooltipPosition,
+  type BarTooltipData,
   type Margin
 } from './utils.ts';
 
@@ -46,7 +47,8 @@ export function useBarChart<T extends object>({
   margin
 }: UseBarChartOptions<T>) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } = useTooltip();
+  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } =
+    useTooltip<BarTooltipData<T>>();
 
   const isVertical = orientation === 'vertical';
   const numSeries = series?.length || 0;

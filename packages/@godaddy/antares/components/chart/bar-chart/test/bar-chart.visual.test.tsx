@@ -3,14 +3,17 @@ import type React from 'react';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
+import { CategoryColorsExample } from '../examples/category-colors';
 import { waitForSelector } from '#test/utils/wait-for-selector.ts';
 import { CustomDomainExample } from '../examples/custom-domain';
+import { CustomTooltipPeriodComparisonExample } from '../examples/custom-tooltip-period-comparison';
 import { FormattedTickMarksExample } from '../examples/formatted-tick-marks';
 import { HorizontalMultiSeriesExample } from '../examples/horizontal-multi-series';
 import { HorizontalSingleSeriesExample } from '../examples/horizontal-single-series';
 import { MultiSeriesExample } from '../examples/multi-series';
 import { RTLHorizontalMultiSeriesExample } from '../examples/rtl-horizontal-multi-series';
 import { RTLMultiSeriesExample } from '../examples/rtl-multi-series';
+import { SeriesColorsExample } from '../examples/series-colors';
 import { DefaultExample } from '../examples/default';
 
 /**
@@ -83,6 +86,27 @@ describe('@godaddy/antares', function antares() {
 
         assume(container.querySelector('svg')).exists();
         await expect(container).toMatchScreenshot('formatted-tick-marks');
+      });
+
+      it('series-colors screenshot', async function seriesColors() {
+        const { container } = await renderExampleAndWait(SeriesColorsExample);
+
+        assume(container.querySelector('svg')).exists();
+        await expect(container).toMatchScreenshot('series-colors');
+      });
+
+      it('category-colors screenshot', async function categoryColors() {
+        const { container } = await renderExampleAndWait(CategoryColorsExample);
+
+        assume(container.querySelector('svg')).exists();
+        await expect(container).toMatchScreenshot('category-colors');
+      });
+
+      it('custom-tooltip-period-comparison screenshot', async function customTooltipPeriodComparison() {
+        const { container } = await renderExampleAndWait(CustomTooltipPeriodComparisonExample);
+
+        assume(container.querySelector('svg')).exists();
+        await expect(container).toMatchScreenshot('custom-tooltip-period-comparison');
       });
     });
 

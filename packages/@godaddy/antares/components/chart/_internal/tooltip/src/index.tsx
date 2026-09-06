@@ -96,8 +96,11 @@ export function Tooltip<T extends object = DataPoint>(
         })
         .map(function toSeriesItem(seriesItem) {
           const datum = tooltipData.datumByKey[seriesItem.id];
+          // Prefer a per-datum color (e.g. bar chart categoryColors); fall back to the series color.
+          const swatchColor = seriesItem._resolveDatumColor?.(datum.datum as T) ?? seriesItem._resolvedColor;
           return {
             ...seriesItem,
+            _resolvedColor: swatchColor,
             value: (formatValue as (d: unknown) => string)(datum.datum)
           };
         });
@@ -128,7 +131,10 @@ export function Tooltip<T extends object = DataPoint>(
                   <Box
                     className={styles.swatch}
                     rounding="full"
-                    style={item._resolvedColor ? { backgroundColor: item._resolvedColor } : undefined}
+                    style={{
+                      opacity: item.opacity ?? undefined,
+                      backgroundColor: item._resolvedColor || undefined
+                    }}
                   />
                 ) : (
                   item.variant && (
@@ -139,6 +145,7 @@ export function Tooltip<T extends object = DataPoint>(
                       focusable="false"
                       width="16"
                       height="16"
+                      style={item.opacity != null ? { opacity: item.opacity } : undefined}
                     >
                       <line
                         x1="0"

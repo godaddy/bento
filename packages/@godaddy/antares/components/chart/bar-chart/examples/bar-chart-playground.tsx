@@ -1,4 +1,4 @@
-import { BarChart, type BarChartProps } from '@godaddy/antares';
+import { BarChart, type BarChartProps, type DataPoint } from '@godaddy/antares';
 import { cityTemperature } from '@visx/mock-data';
 import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 
@@ -22,16 +22,18 @@ export function PlaygroundExample({
   ...rest
 }: PlaygroundExampleProps) {
   const rows = cityTemperature.slice(0, 10);
-  const series = CITIES.slice(0, numSeries).map(function mapCity(city) {
-    return {
-      id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
-      name: city,
-      data: rows.map(function mapRow(row) {
-        const value = parseFloat(row[city as keyof typeof row] as string);
-        return orientation === 'horizontal' ? { x: value, y: row.date } : { x: row.date, y: value };
-      })
-    };
-  });
+  const series: Array<{ id: string; name: string; data: DataPoint[] }> = CITIES.slice(0, numSeries).map(
+    function mapCity(city) {
+      return {
+        id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
+        name: city,
+        data: rows.map(function mapRow(row) {
+          const value = parseFloat(row[city as keyof typeof row] as string);
+          return orientation === 'horizontal' ? { x: value, y: row.date } : { x: row.date, y: value };
+        })
+      };
+    }
+  );
 
   const chart = (
     <BarChart

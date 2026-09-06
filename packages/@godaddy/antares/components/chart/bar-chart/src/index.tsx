@@ -3,23 +3,27 @@ import type {
   AccessorRequirement,
   DataPoint,
   LegendPosition,
-  SeriesConfig,
-  XLabelsOrientation
+  XLabelsOrientation,
+  BarSeriesConfig,
+  Optional,
+  InternalSeriesConfig
 } from '../../types.ts';
 import {
   getXLabelVerticalProps,
   resolveLegendPosition,
   xAccessor as defaultXAccessor,
-  yAccessor as defaultYAccessor
+  yAccessor as defaultYAccessor,
+  isValidColorIndex
 } from '../../utils.ts';
+import { type ReactNode, useCallback, useMemo } from 'react';
 import { useNormalizedSeries } from '#components/chart/_internal/use-normalized-series';
 import { useScrollableXYChart } from '#components/chart/_internal/use-scrollable-xy-chart';
-import { ChartColorProvider, useChartColor } from '#components/chart/_internal/use-chart-color';
+import { chartColorForIndex, ChartColorProvider, useChartColor } from '#components/chart/_internal/use-chart-color';
 import { AxisBottom, AxisLeft, AxisRight } from '@visx/axis';
 import { AxisTitle } from '#components/chart/_internal/axis-title';
 import { GridColumns, GridRows } from '@visx/grid';
 import { Legend } from '#components/chart/_internal/legend';
-import { Tooltip } from '#components/chart/_internal/tooltip';
+import { Tooltip, TooltipContainer } from '#components/chart/_internal/tooltip';
 import { Flex } from '#components/layout/flex';
 import { Box } from '#components/layout/box';
 import { createPortal } from 'react-dom';
@@ -35,7 +39,27 @@ import { useBarChart } from './use-bar-chart.ts';
  * Helper type to determine if accessors are required based on data type.
  * @template T - The data point type
  */
-export type BarChartProps<T extends object = DataPoint> = BarChartPropsBase<T> & AccessorRequirement<T>;
+export type BarChartProps<
+  T extends object = DataPoint,
+  S extends Optional<BarSeriesConfig<T>, 'id'> = Optional<BarSeriesConfig<T>, 'id'>
+> = BarChartPropsBase<T, S> & AccessorRequirement<T>;
+
+/**
+ * Data passed to a custom {@link BarChartPropsBase.renderTooltip} function.
+ *
+ * @public
+ */
+export interface BarChartTooltipRenderProps<
+  T extends object = DataPoint,
+  S extends Optional<BarSeriesConfig<T>, 'id'> = Optional<BarSeriesConfig<T>, 'id'>
+> {
+  /** Category value of the hovered bar group (x when vertical, y when horizontal). */
+  hoveredCategory?: number | string | Date | null;
+  /** Datum for each series at the hovered bar group, keyed by series id. */
+  datumByKey: Partial<Record<string, T>>;
+  /** Resolved series in render order. */
+  series: (InternalSeriesConfig<T, S['tooltipMetadata']> & { id: string })[];
+}
 
 /**
  * Base props for the BarChart component (without accessors).
@@ -47,12 +71,15 @@ export type BarChartProps<T extends object = DataPoint> = BarChartPropsBase<T> &
  * @template T - The data point type. Defaults to DataPoint.
  * @public
  */
-export interface BarChartPropsBase<T extends object = DataPoint> {
+export interface BarChartPropsBase<
+  T extends object = DataPoint,
+  S extends Optional<BarSeriesConfig<T>, 'id'> = Optional<BarSeriesConfig<T>, 'id'>
+> {
   /**
    * Configuration for data series.
    * For a single series, provide an array with one element. For multiple series, provide multiple elements.
    */
-  series: SeriesConfig<T>[];
+  series: S[];
 
   /**
    * Orientation of the bars.
@@ -149,6 +176,21 @@ export interface BarChartPropsBase<T extends object = DataPoint> {
   /** Whether to show the tooltip popover on hover. When false, the tooltip is hidden. @default true */
   tooltip?: boolean;
 
+  /**
+   * Format tooltip values.
+   *
+   * @default the value on the category's opposite axis as a string
+   */
+  tooltipValueFormatter?: (datum: T) => string;
+
+  /**
+   * Render a custom tooltip. Receives every series' datum at the hovered bar group, the
+   * hovered category value, and the resolved series list (with per-series and per-category
+   * colors) — see {@link BarChartTooltipRenderProps}. Return null, undefined, or
+   * a boolean to render no popover.
+   */
+  renderTooltip?: (props: BarChartTooltipRenderProps<T, S>) => ReactNode;
+
   /** Outer container width (omitted = 100%) */
   width?: number;
   /** Outer container height (omitted = 100%) */
@@ -177,9 +219,12 @@ export interface BarChartPropsBase<T extends object = DataPoint> {
 }
 
 /** Props for BarSeries. Internal — not exported. */
-interface BarSeriesProps<T extends object> {
+interface BarSeriesProps<
+  T extends object,
+  S extends Optional<BarSeriesConfig<T>, 'id'> = Optional<BarSeriesConfig<T>, 'id'>
+> {
   /** The series config to render bars for. */
-  seriesValue: SeriesConfig<T>;
+  seriesValue: S;
   /** Zero-based index of this series among all series. */
   seriesIndex: number;
   /** Total number of series in the chart. */
@@ -238,6 +283,7 @@ function BarSeries<T extends object>(props: BarSeriesProps<T>) {
     yAccessor
   } = props;
   const fill = useChartColor();
+  const seriesColor = isValidColorIndex(seriesValue.colorIndex) ? chartColorForIndex(seriesValue.colorIndex) : fill;
   const effectiveSeriesIndex = rtl ? numSeries - 1 - seriesIndex : seriesIndex;
   const groupOffset = (categoryScale.bandwidth() - totalBarWidth) / 2;
   const orderedCategories = rtl ? [...categoryValues].reverse() : categoryValues;
@@ -247,6 +293,9 @@ function BarSeries<T extends object>(props: BarSeriesProps<T>) {
       {orderedCategories.map(function renderBar(catValue, groupIndex) {
         const dataIndex = rtl ? categoryValues.length - 1 - groupIndex : groupIndex;
         const datum = seriesValue.data[dataIndex];
+        // categoryColors is keyed by string; coerce so Date/number categories look up consistently.
+        const categoryColorIndex = seriesValue.categoryColors?.[String(catValue)];
+        const barColor = isValidColorIndex(categoryColorIndex) ? chartColorForIndex(categoryColorIndex) : seriesColor;
 
         if (isVertical) {
           const yValue = yAccessor(datum);
@@ -263,7 +312,8 @@ function BarSeries<T extends object>(props: BarSeriesProps<T>) {
               y={barY}
               width={barWidth}
               height={barHeight}
-              fill={fill}
+              fill={barColor}
+              opacity={seriesValue.opacity ?? 1}
               rx={8}
             />
           );
@@ -283,7 +333,8 @@ function BarSeries<T extends object>(props: BarSeriesProps<T>) {
             y={barY}
             width={barLength}
             height={barWidth}
-            fill={fill}
+            fill={barColor}
+            opacity={seriesValue.opacity ?? 1}
             rx={8}
           />
         );
@@ -305,7 +356,10 @@ function BarSeries<T extends object>(props: BarSeriesProps<T>) {
  * @param props - {@link BarChartProps}
  * @returns JSX element rendering the bar chart
  */
-export function BarChart<T extends object>(props: BarChartProps<T>) {
+export function BarChart<
+  T extends object = DataPoint,
+  S extends Optional<BarSeriesConfig<T>, 'id'> = Optional<BarSeriesConfig<T>, 'id'>
+>(props: BarChartProps<T, S>) {
   const {
     orientation = 'vertical',
     height,
@@ -329,6 +383,8 @@ export function BarChart<T extends object>(props: BarChartProps<T>) {
     xTickFormat,
     yTickFormat,
     tooltip = true,
+    tooltipValueFormatter,
+    renderTooltip: renderTooltipContent,
     xNumTicks,
     yNumTicks,
     xDomain,
@@ -381,7 +437,93 @@ export function BarChart<T extends object>(props: BarChartProps<T>) {
 
   const { innerWidth, innerHeight, svgWidth, svgHeight } = dimensions;
 
+  // Cast away the DataPoint-typed accessor defaults
+  // so they accept the generic datum type.
+  const categoryAccessor = (isVertical ? xAccessor : yAccessor) as (datum: T) => number | string | Date | null;
+  const valueAccessor = (isVertical ? yAccessor : xAccessor) as (datum: T) => number | string | Date | null;
+
+  const seriesWithColor = useMemo(
+    function getSeriesWithColor() {
+      return series.map(function attachColor(oneSeries) {
+        const { colorIndex, categoryColors } = oneSeries;
+        const seriesColor = isValidColorIndex(colorIndex) ? chartColorForIndex(colorIndex) : undefined;
+        const resolveDatumColor = categoryColors
+          ? function datumColor(datum: T) {
+              const category = categoryAccessor(datum);
+              const categoryIndex = categoryColors[category as string];
+              return isValidColorIndex(categoryIndex) ? chartColorForIndex(categoryIndex) : seriesColor;
+            }
+          : undefined;
+        return {
+          ...oneSeries,
+          _resolvedColor: seriesColor,
+          _resolveDatumColor: resolveDatumColor
+        };
+      });
+    },
+    [series, categoryAccessor]
+  );
+
+  const renderTooltip = useCallback(
+    function renderTooltip(data: NonNullable<typeof tooltipData>): ReactNode {
+      if (renderTooltipContent) {
+        const datumByKey: Partial<Record<string, T>> = Object.fromEntries(
+          Object.entries(data.datumByKey).map(function toDatum([key, entry]) {
+            return [key, entry.datum];
+          })
+        );
+        const firstDatum = Object.values(datumByKey)[0];
+        const tooltipSeries = seriesWithColor.map(function withTooltipColor(oneSeries, index) {
+          const defaultColor = chartColorForIndex(index);
+          const resolveDatumColor = oneSeries._resolveDatumColor
+            ? function resolveDatumColorWithDefault(datum: T) {
+                return oneSeries._resolveDatumColor?.(datum) ?? defaultColor;
+              }
+            : undefined;
+          return {
+            ...oneSeries,
+            _resolvedColor: oneSeries._resolvedColor ?? defaultColor,
+            _resolveDatumColor: resolveDatumColor
+          };
+        });
+        const content = renderTooltipContent({
+          hoveredCategory: firstDatum != null ? categoryAccessor(firstDatum) : undefined,
+          datumByKey,
+          series: tooltipSeries as (InternalSeriesConfig<T, S['tooltipMetadata']> & {
+            id: string;
+          })[]
+        });
+        if (content === null || content === undefined || typeof content === 'boolean') {
+          return null;
+        }
+        return <TooltipContainer>{content}</TooltipContainer>;
+      }
+
+      return (
+        <Tooltip
+          // Narrow to DataPoint overload; Tooltip overloads can't resolve generic T. The bar
+          // tooltip payload is a structural subset of visx's TooltipData, hence the double cast.
+          tooltipData={data as unknown as TooltipData<DataPoint>}
+          showArrow={true}
+          formatValue={
+            (tooltipValueFormatter ??
+              function format(value: T) {
+                return String(valueAccessor(value) ?? '');
+              }) as (datum: DataPoint) => string
+          }
+          series={seriesWithColor as InternalSeriesConfig[]}
+        />
+      );
+    },
+    [renderTooltipContent, seriesWithColor, categoryAccessor, valueAccessor, tooltipValueFormatter]
+  );
+
   const effectiveLegendPosition = resolveLegendPosition(legendPosition, series.length);
+
+  const tooltipNode =
+    tooltip && tooltipOpen && tooltipData && typeof tooltipTop === 'number' && typeof tooltipLeft === 'number'
+      ? renderTooltip(tooltipData)
+      : null;
 
   function renderBarHitbox(catValue: any, groupIndex: number) {
     const dataIndex = rtl ? categoryValues.length - 1 - groupIndex : groupIndex;
@@ -446,7 +588,9 @@ export function BarChart<T extends object>(props: BarChartProps<T>) {
       >
         {yAxisTitle && <AxisTitle axis="y" title={yAxisTitle} />}
         <Flex direction="column" flex={1} className={styles.wrapper}>
-          {effectiveLegendPosition === 'top' && <Legend series={series} className={styles.legend} alignSelf="center" />}
+          {effectiveLegendPosition === 'top' && (
+            <Legend series={seriesWithColor} className={styles.legend} alignSelf="center" />
+          )}
           <Box ref={parentRef} dir={direction} className={styles.area}>
             {series && chartWidth > 0 && chartHeight > 0 && (
               <svg
@@ -616,26 +760,14 @@ export function BarChart<T extends object>(props: BarChartProps<T>) {
           </Box>
           {xAxisTitle && <AxisTitle axis="x" title={xAxisTitle} />}
           {effectiveLegendPosition === 'bottom' && (
-            <Legend series={series} className={styles.legend} alignSelf="center" />
+            <Legend series={seriesWithColor} className={styles.legend} alignSelf="center" />
           )}
         </Flex>
 
-        {tooltip &&
-          tooltipOpen &&
-          tooltipData &&
-          typeof tooltipTop === 'number' &&
-          typeof tooltipLeft === 'number' &&
+        {tooltipNode != null &&
           createPortal(
             <div className={styles.tooltipContainer} style={{ top: tooltipTop, left: tooltipLeft }}>
-              {/* Narrow to DataPoint overload; Tooltip overloads can't resolve generic T */}
-              <Tooltip
-                tooltipData={tooltipData as TooltipData<DataPoint> | undefined}
-                showArrow={true}
-                formatValue={function format(value: any) {
-                  return String((isVertical ? yAccessor(value) : xAccessor(value)) ?? '');
-                }}
-                series={series as SeriesConfig<DataPoint>[]}
-              />
+              {tooltipNode}
             </div>,
             document.body
           )}

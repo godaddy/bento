@@ -9,6 +9,16 @@ export interface Margin {
 }
 
 /**
+ * Tooltip payload for a hovered bar group.
+ */
+export interface BarTooltipData<T = unknown> {
+  x: number | string | Date;
+  y?: number;
+  /** Each series' datum at the hovered group, keyed by series id. */
+  datumByKey: Record<string, { datum: T }>;
+}
+
+/**
  * Extracts the ordered list of unique category values across all series.
  * In vertical orientation, categories come from xAccessor; in horizontal, from yAccessor.
  * Deduplication uses string key comparison so that Dates with the same timestamp are treated as equal.

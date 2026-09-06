@@ -73,5 +73,16 @@ export function chartSegmentGapPadAngle(outerRadiusPx: number): number {
  * @param rtl - Whether the chart is in right-to-left mode
  */
 export function getXLabelVerticalProps(rtl: boolean) {
-  return { angle: rtl ? 90 : -90, textAnchor: 'end', dominantBaseline: 'central' } as const;
+  return {
+    angle: rtl ? 90 : -90,
+    textAnchor: 'end',
+    dominantBaseline: 'central'
+  } as const;
+}
+
+/**
+ * Checks if the given index is a valid color index (non-negative integer).
+ */
+export function isValidColorIndex(index: any): index is number {
+  return typeof index === 'number' && Number.isInteger(index) && index >= 0;
 }
