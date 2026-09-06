@@ -1,6 +1,6 @@
 import { forwardRef, type CSSProperties, type ElementType } from 'react';
-import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '../../../../types/polymorphic-react.ts';
-import { composeClassName, composeStyle } from '../../../../utils/render-props.ts';
+import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '#types/polymorphic-react.ts';
+import { composeClassName, composeStyle } from '#utils/render-props.ts';
 import { toRoundingVar, toSpacingVar, type Elevation, type Rounding, type Spacing } from '../../tokens.ts';
 import styles from './index.module.css';
 

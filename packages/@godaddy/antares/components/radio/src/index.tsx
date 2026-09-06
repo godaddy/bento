@@ -5,7 +5,7 @@ import {
   RadioGroup as RACRadioGroup,
   type RadioGroupProps as RACRadioGroupProps
 } from 'react-aria-components';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import { Field, FieldDescription, FieldError, FieldLabel, type FieldOwnProps } from '#components/field';
 import { Flex, type FlexOwnProps } from '#components/layout/flex';
 import styles from './index.module.css';

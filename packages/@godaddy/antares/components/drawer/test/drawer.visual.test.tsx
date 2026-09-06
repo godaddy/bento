@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import assume from 'assume';
-import { preloadTestIcons, resetHover } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons, resetHover } from '#test/utils/test-helpers.tsx';
 import { PlacementsExample } from '../examples/placements.tsx';
 import { BottomSheetExample } from '../examples/bottom-sheet.tsx';
 

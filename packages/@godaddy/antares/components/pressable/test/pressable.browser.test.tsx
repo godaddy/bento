@@ -3,7 +3,7 @@ import { createRef } from 'react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { PlaygroundExample } from '../examples/pressable-playground.tsx';
-import { resetHover } from '../../../utils/test-helpers.tsx';
+import { resetHover } from '#test/utils/test-helpers.tsx';
 
 describe('@godaddy/antares', function packageTests() {
   describe('#Pressable', function pressableTests() {

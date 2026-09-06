@@ -7,6 +7,8 @@ import type { StorybookHelpersOptions } from './types.ts';
 export { toStorybookArgTypes } from './storybook/arg-types.ts';
 export type { StorybookDocs } from './storybook/arg-types.ts';
 export * from './storybook/getters.ts';
+export { Examples } from './storybook/examples-marker.ts';
+export type { ExamplesProps } from './storybook/examples-marker.ts';
 export { processPropsDoc } from './process.ts';
 export type * from './types.ts';
 

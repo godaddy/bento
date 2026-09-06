@@ -8,9 +8,12 @@
       "#components/*": [
         "./components/*/src/index.tsx",
         "./components/chart/types.ts"
-      ]
+      ],
+      "#test/*": ["./test/*"],
+      "#types/*": ["./types/*"],
+      "#utils/*": ["./utils/*"]
     }
   },
-  "include": ["index.ts", "exports", "components", "utils", "types"],
+  "include": ["index.ts", "exports", "components", "utils", "test", "types"],
   "exclude": ["node_modules", "dist"]
 }

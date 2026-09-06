@@ -1,10 +1,10 @@
-# Token / intent lookups
+# Token and intent lookups
 
-Reference for `token-intent-legacy-map.json`. Load this when wiring CSS custom-property fallback chains or resolving a UXCore intent to its legacy `--ux-{hash}`.
+Read this when you need to wire a CSS custom-property fallback chain, or to resolve a UXCore intent to its legacy `--ux-{hash}`.
 
-`token-intent-legacy-map.json` is the **source of truth** for UXCore intent → legacy `--ux-{hash}` mapping. Edit it directly when mappings change — there is no build step.
+`token-intent-legacy-map.json` is the **source of truth** for the intent to `--ux-{hash}` mapping. There is no build step, so edit it directly when a mapping changes.
 
-Keys are UXCore intent paths (e.g. `ux.action.backgroundColor`, `ux.box.density`). Each entry:
+Its keys are UXCore intent paths, such as `ux.action.backgroundColor` or `ux.box.density`. Each entry holds:
 
 | Field           | Description                                                                     |
 | --------------- | ------------------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ Keys are UXCore intent paths (e.g. `ux.action.backgroundColor`, `ux.box.density`
 | `dtcgDefault`   | DTCG default for `token`, when mapped                                           |
 | `tokens`        | Array of `{ token, dtcgDefault }` when multiple curated tokens share one intent |
 
-**Entry shape** — keys are intent paths; match the literal quoting when grepping:
+**Entry shape.** Keys are intent paths, so match the quoting exactly when you grep:
 
 ```json
 // single curated token
@@ -27,7 +27,7 @@ Keys are UXCore intent paths (e.g. `ux.action.backgroundColor`, `ux.box.density`
   "dtcgDefault": "white"
 }
 
-// multiple tokens share one intent → "tokens" array, no top-level "token"/"dtcgDefault"
+// several tokens share one intent: a "tokens" array, and no top-level "token" or "dtcgDefault"
 "ux.box.backgroundColor": {
   "hash": "cao06b",
   "var": "--ux-cao06b",
@@ -43,7 +43,7 @@ Keys are UXCore intent paths (e.g. `ux.action.backgroundColor`, `ux.box.density`
 **Lookup examples:**
 
 ```bash
-# Intent → hash + legacy default
+# intent to hash and legacy default
 grep '"ux.action.backgroundColor"' token-intent-legacy-map.json
 
 # Find by Antares token name
@@ -53,17 +53,17 @@ grep 'color-action-background-tertiary-default' token-intent-legacy-map.json
 grep '"1owc8nc"' token-intent-legacy-map.json
 ```
 
-**CSS fallback chain** — resolve values from `token-intent-legacy-map.json` in this order for the **literal fallback** (innermost value in `var()`):
+**CSS fallback chain.** The **literal fallback** is the innermost value in the `var()`. Pick it in this order:
 
-1. `legacyDefault` — use when non-null
-2. `dtcgDefault` — when `legacyDefault` is null and a curated `token` / `tokens` entry applies
-3. **Sensible default** — when both are null (by property kind)
+1. `legacyDefault`, whenever it is not null
+2. `dtcgDefault`, when `legacyDefault` is null and a curated `token` or `tokens` entry applies
+3. a sensible default for that kind of property, when both are null (table below)
 
 Always wire the full chain so themes can override at each layer:
 
 ```css
-/* Curated token → legacy --ux-{hash} → resolved fallback */
-/* legacyDefault: transparent — used even though dtcgDefault is "white" */
+/* curated token, then legacy --ux-{hash}, then the resolved fallback */
+/* legacyDefault is transparent, which wins even though dtcgDefault is "white" */
 background: var(
   --color-action-background-tertiary-default,
   var(--ux-1owc8nc, transparent)
@@ -72,10 +72,10 @@ background: var(
 /* legacyDefault: #111 */
 color: var(--color-action-text-tertiary-default, var(--ux-ut3xrx, #111));
 
-/* legacyDefault null → fall back to dtcgDefault */
+/* legacyDefault is null, so use dtcgDefault */
 background: var(--color-input-background-hovered, var(--ux-6k4dbq, snow));
 
-/* Intent only (no curated token) */
+/* intent only, no curated token */
 /* legacyDefault: 0.25rem */
 --box-density: var(--ux-1sbfig8, 0.25rem);
 ```
@@ -91,7 +91,9 @@ background: var(--color-input-background-hovered, var(--ux-6k4dbq, snow));
 | `fontFamily`                   | `sans-serif`                                     |
 | `fontSize`                     | `1rem`                                            |
 | `fontWeight`                   | `500`                                            |
-| `density` / spacing            | `0.25rem`                                        |
+| `density` / spacing            | none, spacing follows its own scale rules        |
 | `feedbackColor` / chart colors | pick from nearby mapped intent or `currentColor` |
 
-When an intent has a `tokens` array, use the `dtcgDefault` for the specific Antares token you are styling.
+When an intent has a `tokens` array, use the `dtcgDefault` of the specific Antares token you are styling.
+
+Spacing is the exception to all of this. It has its own two scales and its own chain, so never take a spacing value from this table.

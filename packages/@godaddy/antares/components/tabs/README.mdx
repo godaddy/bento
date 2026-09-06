@@ -1,0 +1,77 @@
+---
+title: Tabs
+description: Tabs organize peer sections of content and let users switch between them without leaving the page.
+---
+
+import { ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Examples } from '@bento/storybook-addon-helpers/runtime';
+import * as Stories from './tabs.stories.tsx';
+
+<Meta of={Stories} name="Overview" />
+
+## Features
+
+- Accessible Tabs semantics powered by React Aria Components.
+- Underline and Manilla visual treatments.
+- Controlled and uncontrolled selection.
+- Automatic horizontal overflow controls that move one tab at a time.
+- Localized labels for the automatic overflow controls.
+
+## Installation
+
+```bash
+npm install @godaddy/antares
+```
+
+## Examples
+
+<Examples of={Stories.Examples} />
+
+## Accessibility
+
+Tabs require an accessible label on `TabList`. Use the keyboard to move between tabs with the arrow keys. Disabled tabs are skipped. Use `keyboardActivation="manual"` when focus should move independently of selection.
+
+`overflowLabels` is optional and defaults to "Previous tabs" and "Next tabs". Provide localized labels when needed; they should describe the logical direction rather than physical directions like "left" or "right", as the component automatically handles RTL layouts.
+
+`TabList` must be rendered inside `Tabs` and must provide `aria-label` or `aria-labelledby`. Give each `Tab` and its corresponding `TabPanel` the same `id`; React Aria uses that key to build their accessible relationship.
+
+## Customization
+
+The component exposes state through data attributes:
+
+- `Tabs`: `data-design="underline"` or `data-design="manilla"`.
+- `Tab`: `data-selected`, `data-hovered`, `data-pressed`, `data-focus-visible`, and `data-disabled`.
+- `TabPanel`: `data-inert` when a force-mounted inactive panel is not interactive.
+
+Use these attributes to extend styling without replacing the accessibility behavior supplied by React Aria Components. You can also use render props in `className` to style based on state (e.g., `className={({ isSelected }) => isSelected ? 'active' : ''}`).
+
+Use `TabList`'s `containerProps` to customize the outer tab list shell, such as increasing its width.
+
+## Best Practices
+
+- Use Tabs for peer panels on the same page and URL.
+- Keep the number of tabs small enough for users to understand the available sections.
+- Do not use Tabs for primary application navigation or route changes.
+- Do not render a standalone `Tab`; compose it inside `Tabs` and `TabList`.
+
+## Props
+
+### Tabs
+
+<ArgTypes of={Stories.Props} />
+
+### TabList
+
+<ArgTypes of={Stories.TabListProps} />
+
+### Tab
+
+<ArgTypes of={Stories.TabProps} />
+
+### TabPanels
+
+<ArgTypes of={Stories.TabPanelsProps} />
+
+### TabPanel
+
+<ArgTypes of={Stories.TabPanelProps} />

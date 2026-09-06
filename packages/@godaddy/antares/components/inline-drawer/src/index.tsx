@@ -5,8 +5,8 @@ import {
   DisclosurePanel as RACDisclosurePanel,
   type DisclosurePanelProps as RACDisclosurePanelProps
 } from 'react-aria-components';
-import { toCssSize } from '../../../utils/css.ts';
-import { composeClassName, composeStyle } from '../../../utils/render-props.ts';
+import { toCssSize } from '#utils/css.ts';
+import { composeClassName, composeStyle } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 /**

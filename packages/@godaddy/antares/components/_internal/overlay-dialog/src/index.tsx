@@ -6,7 +6,7 @@ import {
 } from 'react-aria-components';
 import { Grid, type GridOwnProps } from '#components/layout/grid';
 import { HeaderContext, ContentContext, FooterContext, ButtonGroupContext } from '#components/structure';
-import { composeClassName } from '../../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 export interface OverlayDialogProps

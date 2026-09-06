@@ -1,10 +1,12 @@
 # @godaddy/antares
 
-Guide for working in the Antares component library package.
+The GoDaddy design component library. Each file in `exports/` becomes one public subpath, and `dist/` is build output.
+
+Design proposals for the library live in `docs/pdrs/antares/`.
 
 ## Component work
 
-For component source, examples, tests, stories, docs, layout, styling, and RAC integration, invoke the `antares-components` skill. It is the source of truth for the component recipe, props, CSS and token/intent fallbacks, testing, examples, stories, README, and accessibility conventions.
+Invoke the `antares-components` skill. It is the source of truth for file layout, imports, props, styling, spacing tokens, composition, tests, examples, stories, and README conventions.
 
 ## Build/Test
 
@@ -15,6 +17,5 @@ npm exec nx run @godaddy/antares:typecheck
 npm exec nx run @godaddy/antares:lint
 npm exec nx run @godaddy/antares:build
 npm exec nx run @godaddy/antares:test
+npm exec nx run @godaddy/antares:test:node
 ```
-
-See the `antares-components` skill for testing conventions, coverage, and the snapshot/visual update commands.

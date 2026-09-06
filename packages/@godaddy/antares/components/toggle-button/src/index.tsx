@@ -7,7 +7,7 @@ import {
   useLocale
 } from 'react-aria-components';
 import { Flex } from '#components/layout/flex';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 export interface ToggleButtonGroupProps extends Omit<RACToggleButtonGroupProps, 'children' | 'orientation'> {

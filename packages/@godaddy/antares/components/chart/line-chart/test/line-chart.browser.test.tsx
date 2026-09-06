@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
-import { waitForSelector } from '../../../../utils/wait-for-selector.ts';
+import { waitForSelector } from '#test/utils/wait-for-selector.ts';
 import { BitcoinPriceExample } from '../examples/bitcoin-price';
 import { CityTemperatureExample } from '../examples/city-temperature';
 import { LegendExample } from '../examples/legend';

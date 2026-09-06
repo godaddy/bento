@@ -5,8 +5,8 @@ import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { describe, it } from 'vitest';
 import assume from 'assume';
-import { RTLProvider } from '../../../../utils/rtl-locale-provider.tsx';
-import { waitForSelector } from '../../../../utils/wait-for-selector.ts';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
+import { waitForSelector } from '#test/utils/wait-for-selector.ts';
 
 async function renderAndWait(component: React.ReactElement) {
   const result = await render(component);

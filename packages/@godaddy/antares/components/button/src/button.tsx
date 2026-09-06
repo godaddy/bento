@@ -9,7 +9,7 @@ import {
   Text as RACText
 } from 'react-aria-components';
 import { Icon } from '#components/icon';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 const buttonVariants = cva(styles.button, {

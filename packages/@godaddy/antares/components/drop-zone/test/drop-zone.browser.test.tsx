@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { cdp, userEvent } from 'vitest/browser';
 import assume from 'assume';
-import { preloadTestIcons } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons } from '#test/utils/test-helpers.tsx';
 import { DropZone, Text } from '@godaddy/antares';
 import { DefaultExample } from '../examples/default.tsx';
 import { DisabledExample } from '../examples/disabled.tsx';

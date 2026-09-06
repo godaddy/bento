@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
-import { resetHover } from '../../../utils/test-helpers.tsx';
+import { resetHover } from '#test/utils/test-helpers.tsx';
 import { InlineExample } from '../examples/inline.tsx';
 
 describe('@godaddy/antares', function antares() {

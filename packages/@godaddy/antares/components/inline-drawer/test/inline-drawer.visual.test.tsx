@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
-import { preloadTestIcons, resetHover } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons, resetHover } from '#test/utils/test-helpers.tsx';
 import { DefaultExample } from '../examples/default.tsx';
 import { SidebarNavExample } from '../examples/sidebar-nav.tsx';
 

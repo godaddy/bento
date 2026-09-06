@@ -51,6 +51,7 @@ the same theme Storybook uses.
 
 | Piece | Where | Purpose |
 | --- | --- | --- |
+| `gdsherpa-font.ts` import | `app/layout.tsx` | The `@font-face` and preload links for GD Sherpa, matching uxcore2's generated Storybook faces. Shared with Storybook (`apps/docs/.storybook/main.ts`). Without it, text falls back to Helvetica/Arial |
 | `legacy-tokens.css` import | `app/layout.tsx` | The theme, shared verbatim with Storybook (`apps/docs/.storybook/addons/theme-tokens/recipes.ts`) and the browser test projects (`configs/vitest.setup.mts`). Defines the `--ux-*` custom properties every component's CSS reads. Imported **before** `global.css` so its own `body` rule loses the cascade to Fumadocs' and only the custom properties apply site-wide |
 | `.ux-surface` | `apps/docs/.storybook/legacy-tokens.css` | Shares the theme's `body` rule, so any element can become an on-theme surface. Used by the preview element here, since this site's `body` belongs to Fumadocs |
 | `not-prose` | `story-renderer.tsx` | Fumadocs' typography selectors exclude `.not-prose` subtrees. Same mechanism as Storybook's `sb-unstyled`, which is why previews match across both sites |

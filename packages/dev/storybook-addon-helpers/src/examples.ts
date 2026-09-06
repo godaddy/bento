@@ -234,7 +234,7 @@ export interface ReadmeExamplesResult {
 
 /**
  * Resolves the examples for a component `README.mdx` by following its
- * `<Examples of={Stories.<name>} />` reference to the colocated stories file,
+ * imported `<Examples of={Stories.<name>} />` reference to the colocated stories file,
  * reading that export's `getExamples(<dir>)` folder argument, and discovering the
  * examples in it. The stories file is located by scanning the README's directory
  * for the `*.stories.tsx` that declares the referenced `getExamples` export (when

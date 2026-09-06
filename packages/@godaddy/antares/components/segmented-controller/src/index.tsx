@@ -11,7 +11,7 @@ import {
 import { Flex, type FlexOwnProps } from '#components/layout/flex';
 import { Button } from '#components/button';
 import { Icon } from '#components/icon';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import { useHorizontalScroll } from './use-horizontal-scroll.ts';
 import styles from './index.module.css';
 

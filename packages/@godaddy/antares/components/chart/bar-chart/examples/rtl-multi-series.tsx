@@ -1,6 +1,6 @@
 import { BarChart } from '@godaddy/antares';
 import { cityTemperature } from '@visx/mock-data';
-import { RTLProvider } from '../../../../utils/rtl-locale-provider.tsx';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 
 /**
  * The chart follows the current layout direction, which is normally detected from the browser or system settings. In right-to-left it mirrors the axes, bars, and labels; this example forces RTL so you can see it in a left-to-right page. RTL support is still being refined - axis rendering and tick spacing in particular.

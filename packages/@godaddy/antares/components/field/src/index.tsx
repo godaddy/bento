@@ -16,8 +16,8 @@ import {
   TextArea as RACTextArea,
   type TextAreaProps as RACTextAreaProps
 } from 'react-aria-components';
-import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '../../../types/polymorphic-react.ts';
-import { composeClassName } from '../../../utils/render-props.ts';
+import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '#types/polymorphic-react.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import { Box, type BoxOwnProps } from '#components/layout/box';
 import { Flex, type FlexOwnProps } from '#components/layout/flex';
 import { Icon } from '#components/icon';

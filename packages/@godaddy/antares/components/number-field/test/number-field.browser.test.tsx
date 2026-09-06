@@ -8,7 +8,7 @@ import { NumberFieldFormatOptionsExample } from '../examples/format-options';
 import { NumberFieldHideStepperExample } from '../examples/hide-stepper';
 import { NumberFieldInvalidExample } from '../examples/invalid';
 import { NumberFieldValueScaleExample } from '../examples/value-scale';
-import { waitForSelector } from '../../../utils/wait-for-selector';
+import { waitForSelector } from '#test/utils/wait-for-selector.ts';
 
 describe('@godaddy/antares', function antares() {
   describe('#NumberField', function numberField() {

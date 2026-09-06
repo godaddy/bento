@@ -1,4 +1,4 @@
-import { RTLProvider } from '../../../utils/rtl-locale-provider.tsx';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 import { OverflowExample } from './overflow.tsx';
 
 /**

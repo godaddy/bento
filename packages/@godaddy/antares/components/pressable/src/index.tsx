@@ -2,7 +2,7 @@ import React, { forwardRef, type HTMLAttributes, type ReactElement } from 'react
 import { Pressable as RACPressable } from 'react-aria-components';
 import { mergeProps, useFocusRing, useHover } from 'react-aria';
 import type { PressableProps as RACPressableProps } from 'react-aria/Pressable';
-import { composeClassName, type ClassNameProp } from '../../../utils/render-props.ts';
+import { composeClassName, type ClassNameProp } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 /** Props for {@link Pressable}. */

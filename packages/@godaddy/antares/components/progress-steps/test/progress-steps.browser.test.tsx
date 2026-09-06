@@ -2,7 +2,7 @@ import { render } from 'vitest-browser-react';
 import { beforeAll, describe, it } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import assume from 'assume';
-import { preloadTestIcons } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons } from '#test/utils/test-helpers.tsx';
 import { InteractiveExample } from '../examples/interactive.tsx';
 import { DisabledExample } from '../examples/disabled.tsx';
 

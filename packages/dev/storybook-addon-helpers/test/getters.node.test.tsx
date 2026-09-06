@@ -8,6 +8,7 @@ import {
   getTypeDocs,
   getExamples
 } from '../src/storybook/getters.ts';
+import { Examples } from '../src/storybook/examples-marker.ts';
 
 function TestComponent(props: { size: string; disabled?: boolean }) {
   return <div>Test {JSON.stringify(props)}</div>;
@@ -152,5 +153,12 @@ describe('getExamples', function getExamplesSuite() {
   it('is a no-op at runtime', function noop() {
     expect(getExamples()).toEqual({});
     expect(getExamples('./examples')).toEqual({});
+  });
+});
+
+describe('Examples', function examplesSuite() {
+  it('is a no-op at runtime', function noop() {
+    expect(Examples({ of: {} })).toBeNull();
+    expect(Examples({})).toBeNull();
   });
 });

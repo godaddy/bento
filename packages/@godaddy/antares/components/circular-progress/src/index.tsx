@@ -8,7 +8,7 @@ import {
 } from 'react-aria-components';
 import { Text } from '#components/text';
 import { Flex } from '#components/layout/flex';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 const VIEWBOX_SIZE = 100;

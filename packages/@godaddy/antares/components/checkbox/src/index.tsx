@@ -10,7 +10,7 @@ import { Field, FieldDescription, FieldError, FieldLabel, type FieldOwnProps } f
 import { Flex, type FlexOwnProps } from '#components/layout/flex';
 import { Icon } from '#components/icon';
 import { cx } from 'cva';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 export interface CheckboxIndicatorProps {

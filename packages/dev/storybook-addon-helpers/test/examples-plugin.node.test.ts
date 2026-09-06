@@ -35,6 +35,7 @@ describe('examples-plugin', function examplesPluginTests() {
     expect(result).toContain('DefaultExample');
     expect(result).not.toContain('@order');
     expect(result).not.toContain('?raw');
+    expect(result).toContain("import { Examples } from '@bento/storybook-addon-helpers/runtime';");
     // The expansion imports the doc blocks it emits, so the README author needn't.
     expect(result).toContain("import { Source, Story } from '@storybook/addon-docs/blocks';");
   });

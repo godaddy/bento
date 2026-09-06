@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { describe, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
-import { waitForSelector } from '../../../../utils/wait-for-selector.ts';
+import { waitForSelector } from '#test/utils/wait-for-selector.ts';
 import { DefaultExample } from '../examples/default.tsx';
 import { FormatValueExample } from '../examples/format-value.tsx';
 import { LegendLayoutExample } from '../examples/legend-layout.tsx';

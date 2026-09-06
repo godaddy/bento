@@ -8,7 +8,7 @@ import {
 import styles from './index.module.css';
 import { Text } from '#components/text';
 import { Flex } from '#components/layout/flex';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 
 export interface ProgressBarProps extends Omit<RACProgressBarProps, 'children' | 'isIndeterminate'> {
   /** Visible label text rendered above the track. */

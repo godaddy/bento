@@ -7,7 +7,7 @@ import { set } from '#components/icon';
  *
  * @example
  * ```tsx
- * import { resetHover } from '../../../utils/test-helpers.tsx';
+ * import { resetHover } from '#test/utils/test-helpers.tsx';
  *
  * beforeEach(resetHover);
  * ```
@@ -29,7 +29,7 @@ export function resetHover() {
  *
  * @example
  * ```tsx
- * import { preloadTestIcons } from '../../../utils/test-helpers.tsx';
+ * import { preloadTestIcons } from '#test/utils/test-helpers.tsx';
  *
  * beforeAll(preloadTestIcons);
  * ```

@@ -3,7 +3,7 @@ import { createRef } from 'react';
 import { render } from 'vitest-browser-react';
 import assume from 'assume';
 import { Icon, Tag } from '@godaddy/antares';
-import { preloadTestIcons } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons } from '#test/utils/test-helpers.tsx';
 import { DefaultExample } from '../examples/default.tsx';
 import { EmphasesExample } from '../examples/emphases.tsx';
 import { SizesExample } from '../examples/sizes.tsx';

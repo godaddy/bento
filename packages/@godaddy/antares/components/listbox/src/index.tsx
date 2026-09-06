@@ -6,7 +6,7 @@ import {
   type Key as RACKey
 } from 'react-aria-components';
 import { Flex, type FlexOwnProps } from '#components/layout/flex';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import styles from './index.module.css';
 
 export interface ListBoxProps<T> extends RACListBoxProps<T>, FlexOwnProps {}

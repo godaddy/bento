@@ -2,56 +2,101 @@
 name: antares-components
 description: >-
   Use when creating, editing, or testing components in the @godaddy/antares
-  package — component source, examples, tests, stories, docs, layout, styling,
+  package - component source, examples, tests, stories, docs, layout, styling,
   or RAC integration decisions.
 ---
 
 # Antares Components
 
-Scoped conventions for component work in `packages/@godaddy/antares/`.
+How to build and change components in `packages/@godaddy/antares/`.
 
-## Component vs RAC
+## What a component looks like
 
-- Prefer Antares components (`Button`, `Select`, `Calendar`, …) over RAC primitives when one exists. RAC is an escape hatch for behavior Antares doesn't expose yet.
-- Do not use RAC components in examples or docs — use Antares components instead.
-- RAC prefix for react-aria-components: `import { Button as RACButton } from 'react-aria-components'`
+```
+components/<name>/
+├─ src/index.tsx                    the barrel
+├─ src/index.module.css             styles, only if it has any
+├─ examples/default.tsx             one example per file
+├─ examples/<name>-playground.tsx   powers the Playground story
+├─ test/<name>.node.test.tsx        SSR snapshots
+├─ test/<name>.browser.test.tsx     interactions
+├─ test/<name>.visual.test.tsx      screenshots, when the look is worth locking
+├─ <name>.stories.tsx               Storybook entry
+└─ README.mdx                       documentation
+```
 
-## Layout
+Build them in that order, then add the public export. Node and browser tests belong on every component. Visual tests are selective, and about half the library has none. Everything under `test/__snapshots__/` and `test/__screenshots__/` is generated, so never edit those by hand.
 
-- Prefer `Flex`, `Box`, and `Grid` over hand-rolled CSS. Use layout props (`direction`, `gap`, `alignItems`, `justifyContent`, `wrap`, `padding`, `inlinePadding`, `blockPadding`, `display`) before adding flex/gap rules in `*.module.css`.
-- Use `Flex as={X}` (or `Box as=…`) to give an element flex/layout semantics instead of an extra wrapper div — works for RAC primitives (`RACButton`, …) and native tags (`"div"`, `"nav"`, `"ol"`, `"li"`, etc).
-- When a component wraps such an element, extend `Omit<FlexOwnProps, 'as'>` and spread the rest onto it so callers can pass layout/HTML props. Put fixed props after the `{...rest}` spread so they can't be overridden.
-- Polymorphic `as` can't infer a generic RAC component's type params (see `types/polymorphic-react.ts`). Either pin them at the call site — `Flex as={RACCalendar<CalendarDate>}` — or keep the generic component as the outer element with a `Flex` nested inside. Never use a bare, unparameterized `Flex as={RACCalendar}`.
-- Spacing tokens: `gap="sm"`, `gap="md"`, etc. In CSS, use `var(--sp-sm)` directly. Tokens defined in `components/layout/tokens.ts`. Use t-shirt sizes (`sm`, `md`, `lg`).
+A few older folders fall short of this, such as `_internal/overlay-dialog`, which has only `src/`. Leave them alone, but don't take them as a model.
+
+### What goes in src/
+
+**`src/index.tsx` is the folder's barrel.** Everything public leaves through it, and it is what `#components/<name>` and `exports/<Area>.ts` import. Nothing else in `src/` is ever imported from outside the folder.
+
+A small component defines itself right there, as `alert` and `tabs` do. Past that, give each exported component or hook its own file and let `index.tsx` re-export them:
+
+- `button/src/index.tsx` re-exports `button.tsx` (`Button`, `LinkButton`) and `close-button.tsx` (the preset).
+- `structure/src/index.tsx` re-exports `header.tsx`, `content.tsx`, `footer.tsx`, and `button-group.tsx`, and nothing else. That folder has no CSS at all, because its regions are built from layout components.
+- `carousel/src/` keeps its hooks beside it: `use-accessibility.tsx`, `use-navigation-controls.tsx`.
+
+Each styled component gets its own stylesheet, so `text/src/` has both `index.module.css` and `heading.module.css`.
+
+### Naming and grouping
+
+Folders and files are kebab-case (`text-field`, `date-picker`, `use-chart-color`). `README.mdx` is the exception.
+
+Related components group under `components/<group>/<name>/`, as `layout/box/` and `chart/bar-chart/` do. A group folder can also hold code its members share, such as `chart/types.ts` and `chart/utils.ts`, and it needs a `meta.json` naming it and ordering its pages in the docs sidebar:
+
+```json
+{ "title": "Layout", "pages": ["box", "flex", "grid"] }
+```
+
+### Public exports
+
+Each `exports/<Area>.ts` file is the source of truth for one public subpath (`@godaddy/antares/<Area>`, mapped by `"./*"` in `package.json`). The barrel `index.ts` only re-exports those files, so edit the area file, not the barrel. A brand-new area also needs an `export * from './exports/<Area>'` line in `index.ts`.
+
+Area files are PascalCase, one per area. Usually the area is the main component (`Button.ts`, `TextField.ts`). Related components share a family name (`Layout.ts` for Box/Flex/Grid, `Chart.ts` for all charts). A component that exports a family exports every piece of it, contexts and props types included, the way `Structure.ts` exports `Header`, `HeaderContext`, and `HeaderProps`.
+
+### Internal-only components
+
+Put them in `components/_internal/<name>/` or `components/<group>/_internal/<name>/`. Internal hooks get their own folder there too, such as `chart/_internal/use-chart-color/`.
+
+They are built like any other component, examples, stories, and README included. The only step they skip is the public export.
 
 ## Imports
 
-- Path alias within package: `import { Icon } from '#components/icon'`
-- Public import in examples: `import { Icon } from '@godaddy/antares'`
-- Internal components: use `#components/...`
+Import by alias inside the package, not by relative path:
 
-## Component recipe
+| Specifier                                               | Use for                           |
+| ------------------------------------------------------- | --------------------------------- |
+| `#components/icon`                                      | internal component (no extension) |
+| `#utils/render-props.ts`, `#types/polymorphic-react.ts` | shipped helper (with extension)   |
+| `#test/utils/test-helpers.tsx`                          | test helper                       |
+| `@godaddy/antares`                                      | examples, the public import       |
 
-1. `components/<name>/src/index.tsx` and `index.module.css` (if styled)
-2. `components/<name>/examples/default.tsx` and `components/<name>/examples/<name>-playground.tsx`
-3. `components/<name>/test/<name>.node.test.tsx` (SSR snapshots)
-4. `components/<name>/test/<name>.browser.test.tsx` (interactions)
-5. `components/<name>/test/<name>.visual.test.tsx` (screenshots)
-6. `components/<name>/<name>.stories.tsx`
-7. `components/<name>/README.mdx`
-8. Add the public export: create/extend `exports/<Area>.ts`, then add `export * from './exports/<Area>'` to the barrel `index.ts`
+`#components/*` resolves to `components/*/src/index.tsx`, so it can only reach a component's barrel. Code shared by a group sits above that, as `layout/tokens.ts` and `chart/types.ts` do, and those imports stay relative (`../../tokens.ts`). That is the one place a relative path is right.
 
-`exports/<Area>.ts` is the source of truth for each public subpath (`@godaddy/antares/<Area>`, mapped via `package.json` `"./*"`); `index.ts` only re-exports those files, so edit the area file, not the barrel. PascalCase, one file per area — usually the primary component (`Button.ts`, `TextField.ts`); related families group under a family name (`Layout.ts` = Box/Flex/Grid, `Chart.ts` = all charts). A brand-new area also needs its `export *` line added to `index.ts`.
+## Writing the component
 
-Grouping optional: `components/<group>/<name>/` (e.g. `layout/box/`). Kebab-case names for folders and files (e.g. `text-field`, `date-picker`). Docs files (README.mdx) exempt.
+**Building something with an interior the consumer fills in, an overlay, or a trigger? Read `references/composition.md` first.**
 
-### Internal-only (`_internal`)
+### Antares first, RAC second
 
-Use `components/_internal/<name>/` or `components/<group>/_internal/<name>/`. Same structure, skip step 8 (the public-export step) since internal components aren't exported.
+- If Antares already has the component (`Button`, `Select`, `Calendar`, …), use it. Reach for a react-aria-components (RAC) primitive only when Antares doesn't cover the behavior yet.
+- Never use RAC in examples or docs. Use Antares components there.
+- Import RAC with a `RAC` prefix: `import { Button as RACButton } from 'react-aria-components'`.
 
-## Props
+### Layout
 
-Prefer `interface` for props. Use `type` when required (e.g. polymorphic props with `PolymorphicProps<C, OwnProps>`). Extend RAC with `Omit`. JSDoc each prop.
+Use `Flex`, `Box`, and `Grid` instead of writing your own CSS. Try their props first (`direction`, `gap`, `alignItems`, `justifyContent`, `wrap`, `padding`, `inlinePadding`, `blockPadding`, `display`) before adding flex or gap rules to `*.module.css`.
+
+- `Flex as={X}` gives an existing element layout semantics, so you don't need an extra wrapper div. It works with RAC primitives (`RACButton`, …) and native tags (`"div"`, `"nav"`, `"ol"`, `"li"`, …).
+- When your component wraps such an element, extend `Omit<FlexOwnProps, 'as'>` and spread the rest onto it, so callers can pass layout and HTML props. Put fixed props **after** the `{...rest}` spread so callers can't override them.
+- Spacing props take t-shirt sizes: `gap="md"`, `padding="sm"`. Which scale belongs where is in `references/styling.md`.
+
+### Props
+
+Use an `interface` for props. Use a `type` only when you must, such as polymorphic props with `PolymorphicProps<C, OwnProps>`. Extend RAC types with `Omit`. Add JSDoc to every prop and leave a blank line between props.
 
 ```typescript
 export interface ButtonProps extends Omit<RACButtonProps, 'className'> {
@@ -66,248 +111,29 @@ export interface ButtonProps extends Omit<RACButtonProps, 'className'> {
 }
 ```
 
-## Composition
+## Styling
 
-A component with an interior **exposes** it instead of configuring it through props like `title`/`actions`/`media`. The consumer composes generic regions — `Header`, `Content`, `Footer`, `ButtonGroup` — and the component only positions and spaces them. Config props describe behavior; structure belongs to the consumer.
+Styled components keep their CSS in `src/index.module.css`. Three rules hold everywhere:
 
-A region renders standalone with its own defaults, or adopts a parent's styling when that parent provides its context. Precedence is **defaults < parent context < consumer props**, via `useContextProps`:
+- Merge the incoming class name with `composeClassName(className, styles.className)`, so a caller's `className` adds to your styles instead of replacing them.
+- Use data-attribute selectors for RAC state only: `[data-hovered]`, `[data-pressed]`, `[data-disabled]`, …
+- Keep every selector at maximum **0-1-0** specificity. Wrap state, attribute, and element selectors in `:where()`, for example `&:where([data-hovered])`, `.overlay:where([data-entering])`, `.header :where([slot="close"])`. If a rule truly has to go higher (to beat an inline style or a third-party stylesheet), add a comment saying why.
 
-```tsx
-export const Header = forwardRef<HTMLElement, HeaderProps>(function Header(props, ref) {
-  [props, ref] = useContextProps(props, ref, HeaderContext);
+**`references/styling.md` has the rest: focus and disabled recipes, value conventions, spacing tokens, and custom properties.**
 
-  return <Flex as="header" justifyContent="space-between" padding="md" {...props} ref={ref} />;
-});
-```
+## Examples, tests, and docs
 
-- **Region defaults go before `{...props}`** so context and consumers can override them — the opposite of the usual rule. Only an invariant the consumer must not break goes after the spread.
-- **Export the context and props type with the region**, since a consumer may need to provide the context.
-- **Place regions by named grid area, not source order**, so they can be written in any order.
-- **Regions own their padding; shells do not.** Padding on a scrolling element collapses at the scroll edge.
-- **Keep a shell's layout CSS and its region contexts together** — the CSS defines the areas, the contexts assign them, and copies drift apart.
+Examples are the unit everything else is built on: tests render them, and stories and the README are generated from them.
 
-### Presets
+- **Examples**: one exported function per file, importing from `@godaddy/antares`. Rules in `references/docs.md`.
+- **Tests**: node (snapshots), browser (behavior), visual (screenshots), aiming at 100% coverage. Rules in `references/testing.md`.
+- **Stories and `README.mdx`**: thin wrappers around the examples. Rules in `references/docs.md`.
 
-A preset pre-fills props on an existing component so a common composition needs no wiring (a close button that defaults to `slot="close"`; a heading that slots as a dialog's title). Spread the caller's props **after** the defaults so every one stays overridable. When a preset can't express a variant, document the raw composition rather than growing props for it.
+## Checking your work
 
-### Where props land
+Run targets through Nx from the repo root, scoped to this package: `npm exec nx run @godaddy/antares:<target>`.
 
-One component often renders several nested elements, such as a backdrop, positioned panel, and dialog, or a field and its control. Switching between components should not require guessing which element a prop targets. Props should always map to the same role.
-
-- **One element is the primary surface, and `...rest`, `className`, `style`, and `ref` always target it.** For overlays, that's the `OverlayDialog`. Where there is no dialog, such as `Tooltip`, it's the positioned panel. No per-component exceptions.
-- **Layer-specific behavior stays flat.** Props such as `placement`, `offset`, `maxSize`, and open state are exposed individually and documented with JSDoc. `Pick` only the required props from the corresponding RAC type rather than extending it wholesale, since exposing an API is a one-way door.
-- **Other layers are configured through a props bag named for the layer**, such as `overlayProps` (backdrop) or `containerProps` (positioned panel), and only on components that actually have that layer. A component without a backdrop should not expose `overlayProps`.
-- **Each props bag omits any prop already exposed at the top level**, so every prop has exactly one home. `className` and `style` are merged with the layer's defaults using `composeClassName` and `composeStyle`, never replaced.
-- **State props are accepted by both the component and its trigger**, where applicable, so either can be controlled.
-
-A props bag is for configuring a layer, not expressing structure. If it starts carrying structure, expose that layer as a lower-level component instead.
-
-## CSS
-
-- Use the `styles.className` pattern, and merge incoming class names with `composeClassName(className, styles.className)` so a caller's `className` augments the styles instead of replacing them.
-- Data-attribute selectors for RAC state only: `[data-hovered]`, `[data-pressed]`, `[data-disabled]`, etc.
-- Private vars: `--_` prefix. Expose a public `--var`; internally read it as `--_var: var(--var, fallback)`.
-- Focus: `&:where([data-focus-visible]) { outline: 2px solid Highlight; outline-offset: 2px; }`
-- Disabled: `&:where([data-disabled]) { opacity: 0.4; cursor: not-allowed; }` (use `&:where(:disabled)` only for native HTML elements)
-- **Border-width:** always `1px`. No other values, no variables.
-- **Font-weight:** prefer `bolder` when text needs bold and the element doesn't provide it natively; avoid numeric weights and `bold` in new code.
-- **Specificity:** every selector should compute to exactly **0-1-0**. Wrap state, attribute, and element selectors in `:where()` (for example, `&:where([data-hovered])`, `.overlay:where([data-entering])`, `.header :where([slot="close"])`). If a rule must exceed `0-1-0` (for example, to compete with inline styles or a third-party stylesheet), leave a comment explaining why.
-
-### Token / intent fallbacks
-
-`references/token-intent-legacy-map.json` is the **source of truth** for UXCore intent → legacy `--ux-{hash}` mappings. For the entry schema, `grep` lookup recipes, and the CSS fallback chain (`legacyDefault` → `dtcgDefault` → sensible default), see [token-intent-map.md](references/token-intent-map.md).
-
-## Testing
-
-Three Vitest projects: `*.node.test.tsx`, `*.browser.test.tsx`, `*.visual.test.tsx`. Aim for 100% coverage.
-
-**Import examples, not `src/` directly.** To close coverage gaps, add/update examples.
-
-Describe hierarchy: `'@godaddy/antares'` > `'#ComponentName'`. Use named functions (not arrow).
-
-### Node tests
-
-**Snapshot-only.** Render an example and `toMatchSnapshot` — don't hand-assert markup (`toContain`, regex, attribute checks); the snapshot _is_ the assertion and captures structure, ARIA, and data-attributes. Cover extra states/branches by adding an example (and snapshotting it), not by writing manual node assertions.
-
-```typescript
-import { expect, describe, it } from 'vitest';
-import { renderToString } from 'react-dom/server';
-import { DefaultExample } from '../examples/default.tsx';
-
-describe('@godaddy/antares', function packageTests() {
-  describe('#Button', function buttonTests() {
-    it('renders default', function render() {
-      const html = renderToString(<DefaultExample />);
-      expect(html).toMatchSnapshot();
-    });
-  });
-});
-```
-
-Update snapshots when they legitimately change: `npm exec nx run @godaddy/antares:test:node:update`.
-
-### Browser tests
-
-**Test behavior, not structure.** Cover user interactions such as focus and Tab order, keyboard input (Enter, Space, arrow keys), press events, state changes, selection, disabled behavior, form submissions, and more.
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { render } from 'vitest-browser-react';
-import { userEvent } from 'vitest/browser';
-import { DefaultExample } from '../examples/default.tsx';
-
-describe('@godaddy/antares', function packageTests() {
-  describe('#Button', function buttonTests() {
-    it('handles click', async function click() {
-      const { getByRole } = await render(<DefaultExample />);
-      await userEvent.click(getByRole('button'));
-      await expect.element(getByRole('button')).toBeVisible();
-    });
-  });
-});
-```
-
-### Visual tests
-
-One screenshot per example (cover variants/orientations/states by adding examples, not by hand-building markup). Render the example and `toMatchScreenshot('name')`. If the example renders an `Icon`, `beforeAll(preloadTestIcons)`; `beforeEach(resetHover)` clears hover so screenshots are deterministic (both from `utils/test-helpers.tsx`).
-
-```typescript
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { render } from 'vitest-browser-react';
-import { preloadTestIcons, resetHover } from '../../../utils/test-helpers.tsx';
-import { DefaultExample } from '../examples/default.tsx';
-
-describe('@godaddy/antares', function packageTests() {
-  beforeAll(preloadTestIcons);
-  beforeEach(resetHover);
-
-  describe('#Button', function buttonTests() {
-    it('default example', async function defaultRender() {
-      const { container } = await render(<DefaultExample />);
-      await expect(container).toMatchScreenshot('default');
-    });
-  });
-});
-```
-
-Baselines are **Linux** PNGs generated by the `/update-screenshots` CI bot after the PR opens. Visual tests run on CI by default; run them locally only to inspect: `npm exec nx run @godaddy/antares:test:visual` (`:test:visual:update` to refresh baselines).
-
-## Examples
-
-Create one kebab-case file per example under `examples/`, with each file exporting **exactly one function**. That function represents the example. Import all components from `@godaddy/antares`.
-
-The exported function name becomes the story title and heading (`PrimaryExample` → `Primary`). JSDoc on the function controls the generated documentation:
-
-- **Free text** - Description shown below the example heading.
-- **`@title <text>`** - Overrides the heading (defaults to the humanized function name).
-- **`@order <n>`** - Controls sort order in ascending order. Examples without `@order` appear last, sorted alphabetically.
-- **`@ignore`** - Excludes the example entirely. No story or README block is generated. This is typically used for examples that exist only for tests.
-
-For consistency, include a `DefaultExample` in `default.tsx` and assign it `@order 1` so it always renders first.
-
-```tsx
-import { Button } from '@godaddy/antares';
-
-/**
- * The default button.
- * @order 1
- */
-export function DefaultExample() {
-  return <Button>Delete</Button>;
-}
-```
-
-`<name>-playground.tsx` is treated specially. It is excluded from the generated examples and is used only to power the `Playground` story (see Stories).
-
-## Stories
-
-Add `'use client'`, then import helpers from `@bento/storybook-addon-helpers`. A stories file has four parts:
-
-- **Meta** - `export default getMeta({ title: 'components/ComponentName' })`
-- **Props** - `getComponentDocs(Component)` exported as `Props` (auto-generated props table); add `<Name>Props` for any extra public components
-- **Examples** - `export const examples = getExamples('./examples')`. This discovers every example file and generates one indexed sidebar story per example (ordered/titled from JSDoc). The README references this same export.
-- **Playground** - Use `getStory(PlaygroundExample, { args, argTypes })`. The build injects the `render` function, while `args` and `argTypes` are type-checked against the example's props. Provide a `description` for every `argType`, and choose an appropriate control such as `'boolean'`, `'text'`, `'number'`, `'object'`, `'radio'` (2 to 4 options), `'select'` (5 or more options), or any other suitable control.
-
-```tsx
-'use client';
-import { getComponentDocs, getExamples, getMeta, getStory } from '@bento/storybook-addon-helpers';
-import { Button } from './src/index.tsx';
-import { PlaygroundExample } from './examples/button-playground.tsx';
-
-export default getMeta({ title: 'components/Button' });
-
-export const Props = getComponentDocs(Button);
-
-export const Examples = getExamples('./examples');
-
-export const Playground = getStory(PlaygroundExample, {
-  args: {
-    variant: 'primary',
-    size: 'md'
-  },
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'critical', 'inline', 'minimal'],
-      description: 'Visual variant of the button'
-    },
-    size: {
-      control: 'radio',
-      options: ['sm', 'md'],
-      description: 'Size of the button'
-    }
-  }
-});
-```
-
-## README.mdx
-
-- Include frontmatter with a `title` and a brief `description`.
-- Import only the blocks you write yourself (`Meta`, `ArgTypes`) from `@storybook/addon-docs/blocks`, plus `* as Stories` from the stories file.
-- Use the following suggested `##` sections, in this order, when applicable: Features, Installation, Examples, Customization, Accessibility, Best Practices, Troubleshooting, Props. Add other sections if they better suit the component or documentation.
-- Use `<Meta of={Stories} name="Overview" />` for the overview and `<ArgTypes of={Stories.Props} />` for the props table.
-- Use `<Examples of={Stories.examples} />` to render **all** examples. At build time, it expands into one `###` heading, the JSDoc description, a live `<Story>`, and a `<Source>` snippet for each example.
-- Open **Props** with an anatomy block when the component has a composed interior or a trigger: a `tsx` snippet of the element tree, tags only, no props or children beyond what the structure needs (`slot="title"`, `placement="right"`), ending in `{/* ... */}` for the regions a consumer may add. It shows what nests inside what before the tables explain each prop.
-
-```tsx
-<PopoverTrigger>
-  <Button />
-  <Popover>
-    <Heading slot="title" />
-    <CloseButton />
-    <Content />
-    {/* ... */}
-  </Popover>
-</PopoverTrigger>
-```
-
-```mdx
----
-title: Button
-description: The Button component is a clickable control for actions, with variants and sizes.
----
-
-import { ArgTypes, Meta } from '@storybook/addon-docs/blocks';
-import * as Stories from './button.stories.tsx';
-
-<Meta of={Stories} name="Overview" />
-
-## Features
-
-- Accessible button component
-- Multiple variants and sizes
-
-## Installation
-
-\`\`\`bash
-npm install @godaddy/antares
-\`\`\`
-
-## Examples
-
-<Examples of={Stories.Examples} />
-
-## Props
-
-<ArgTypes of={Stories.Props} />
-```
+- `typecheck` and `lint` after every change
+- `test` runs the node and browser projects with coverage. Use `test:node` or `test:browser` for one of them
+- add `:update` to a test target to refresh its snapshots
+- `test:visual` runs on CI, so you rarely need it locally

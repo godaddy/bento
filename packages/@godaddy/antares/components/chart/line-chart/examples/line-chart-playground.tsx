@@ -1,6 +1,6 @@
 import { LineChart, type LineChartProps, type LineSeriesVariant } from '@godaddy/antares';
 import { cityTemperature } from '@visx/mock-data';
-import { RTLProvider } from '../../../../utils/rtl-locale-provider.tsx';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 
 export interface PlaygroundExampleProps
   extends Omit<

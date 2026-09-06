@@ -2,7 +2,7 @@ import type { Plugin } from 'vite';
 import { readFile } from 'node:fs/promises';
 import { discoverExamplesForReadme, type ExampleDescriptor } from '../examples.ts';
 
-/** Matches the `<Examples of={Stories.<name>} />` marker authored in a component README. */
+/** Matches the imported `<Examples of={Stories.<name>} />` marker authored in a component README. */
 const EXAMPLES_MARKER = /<Examples\b[^>]*\/>/;
 /** Extracts the export name from an `of={Stories.<name>}` attribute on the marker. */
 const OF_ATTR = /\bof=\{\s*[\w$]+\.([\w$]+)\s*\}/;
@@ -11,7 +11,7 @@ const BLOCKS_MODULE = '@storybook/addon-docs/blocks';
 const REQUIRED_BLOCKS = ['Source', 'Story'];
 
 /**
- * Vite plugin that expands the `<Examples of={Stories.<name>} />` marker in a
+ * Vite plugin that expands the imported `<Examples of={Stories.<name>} />` marker in a
  * component README into one documented block per example (heading, JSDoc
  * description, `<Story>` preview, and raw `<Source>`). The examples are resolved
  * by following the `of` reference to the colocated stories file and its

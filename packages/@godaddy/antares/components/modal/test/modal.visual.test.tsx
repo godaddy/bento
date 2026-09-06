@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
-import { preloadTestIcons, resetHover } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons, resetHover } from '#test/utils/test-helpers.tsx';
 import { DefaultExample } from '../examples/default.tsx';
 import { ScrollableExample } from '../examples/scrollable.tsx';
 import { PlaygroundExample } from '../examples/modal-playground.tsx';

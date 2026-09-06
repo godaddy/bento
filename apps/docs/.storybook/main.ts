@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 import replace from '@rollup/plugin-replace';
 import { generateCdnUrl } from '@godaddy/generate-cdn-url';
 import { CDN, ICON_PACKAGE, DESIGN_ASSETS_VERSION } from '../../../packages/@godaddy/antares/utils/icon-cdn.ts';
+import { GDSHERPA_FONT_FACE_CSS, GDSHERPA_PRELOAD_HREFS } from './gdsherpa-font.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -68,6 +69,13 @@ const config: StorybookConfig = {
     reactDocgen: false
   },
 
+  previewHead: (head) =>
+    `${head ?? ''}
+    ${GDSHERPA_PRELOAD_HREFS.map(
+      (href) => `<link rel="preload" href="${href}" as="font" type="font/woff2" crossorigin="anonymous">`
+    ).join('\n    ')}
+    <style>${GDSHERPA_FONT_FACE_CSS}</style>`,
+
   async viteFinal(config: UserConfig) {
     const versionMatch = packageJson.version.match(/^(\d+)\.(\d+)\.(\d+)/)?.slice(1) ?? ['0', '0', '0'];
 
@@ -125,6 +133,10 @@ const config: StorybookConfig = {
             find: new RegExp(`^@bento/${pkg}$`),
             replacement: resolve(__dirname, `../../../packages/dev/${pkg}/src`)
           })),
+          {
+            find: /^@bento\/storybook-addon-helpers\/runtime$/,
+            replacement: resolve(__dirname, '../../../packages/dev/storybook-addon-helpers/src/runtime.ts')
+          },
           // Regular @bento packages
           {
             find: /^@bento\/(.*)$/,

@@ -45,7 +45,7 @@ const BLOCKS_MODULE = '@storybook/addon-docs/blocks';
 const REQUIRED_BLOCKS = ['Source', 'Story'];
 
 /**
- * Remark plugin that expands an `<Examples of={Stories.<name>} />` node into a
+ * Remark plugin that expands an imported `<Examples of={Stories.<name>} />` node into a
  * live-rendered, documented example per file discovered by following that
  * reference to the colocated stories file and its `getExamples(<dir>)` folder
  * (via the shared {@link discoverExamplesForReadme} core). For each example it

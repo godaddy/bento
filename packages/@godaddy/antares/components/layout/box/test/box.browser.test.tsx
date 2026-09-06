@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { resetHover } from '../../../../utils/test-helpers.tsx';
+import { resetHover } from '#test/utils/test-helpers.tsx';
 import { PaddingExample } from '../examples/padding.tsx';
 import { AlignmentExample } from '../examples/alignment.tsx';
 import { HostCompositionExample } from '../examples/host-composition.tsx';

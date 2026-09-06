@@ -8,7 +8,7 @@ import { Box } from '#components/layout/box';
 import { Flex, type FlexProps } from '#components/layout/flex';
 import { Pagination } from '#components/pagination';
 import { cx } from 'cva';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import { useNavigationControls, type UseNavigationControlsProps } from './use-navigation-controls.tsx';
 import { useAccessibility } from './use-accessibility.tsx';
 import styles from './index.module.css';

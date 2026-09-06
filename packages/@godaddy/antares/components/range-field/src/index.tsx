@@ -10,7 +10,7 @@ import {
 } from 'react-aria-components';
 import { Field, FieldDescription, FieldLabel, type FieldOwnProps } from '#components/field';
 import { Flex } from '#components/layout/flex';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import {
   createRef,
   type ForwardedRef,

@@ -1,6 +1,6 @@
 import { BarChart, type BarChartProps, type DataPoint } from '@godaddy/antares';
 import { cityTemperature } from '@visx/mock-data';
-import { RTLProvider } from '../../../../utils/rtl-locale-provider.tsx';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 
 export interface PlaygroundExampleProps
   extends Omit<BarChartProps, 'series' | 'xAccessor' | 'yAccessor' | 'xTickFormat' | 'yTickFormat'> {

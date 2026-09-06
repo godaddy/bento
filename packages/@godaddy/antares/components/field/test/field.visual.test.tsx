@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
-import { preloadTestIcons } from '../../../utils/test-helpers.tsx';
+import { preloadTestIcons } from '#test/utils/test-helpers.tsx';
 import { DefaultExample } from '../examples/default';
 import { FieldGroupIconAccessoriesExample } from '../examples/icon-accessories';
 import { FieldGroupLeadingControlExample } from '../examples/leading-control';

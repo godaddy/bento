@@ -2,7 +2,7 @@ import { DefaultExample } from '../examples/default.tsx';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { describe, it, vi } from 'vitest';
-import { resetHover } from '../../../utils/test-helpers.tsx';
+import { resetHover } from '#test/utils/test-helpers.tsx';
 import assume from 'assume';
 
 describe('@godaddy/antares', function antares() {

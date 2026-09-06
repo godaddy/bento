@@ -1,6 +1,6 @@
 import { BarChart } from '@godaddy/antares';
 import { exoplanets as allExoplanets } from '@visx/mock-data';
-import { RTLProvider } from '../../../../utils/rtl-locale-provider.tsx';
+import { RTLProvider } from '#utils/rtl-locale-provider.tsx';
 
 interface ExoplanetSurveyPoint {
   name: string;

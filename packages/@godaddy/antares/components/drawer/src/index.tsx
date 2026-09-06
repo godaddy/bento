@@ -8,8 +8,8 @@ import {
   type ModalOverlayProps as RACModalOverlayProps,
   composeRenderProps
 } from 'react-aria-components';
-import { toCssSize } from '../../../utils/css.ts';
-import { composeClassName } from '../../../utils/render-props.ts';
+import { toCssSize } from '#utils/css.ts';
+import { composeClassName } from '#utils/render-props.ts';
 import { Flex } from '#components/layout/flex';
 import { OverlayDialog } from '#components/_internal/overlay-dialog';
 import styles from './index.module.css';

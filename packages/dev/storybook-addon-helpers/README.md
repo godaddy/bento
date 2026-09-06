@@ -114,10 +114,11 @@ Author one file per example under `examples/`, each exporting exactly one functi
 export const examples = getExamples('./examples');
 ```
 
-Reference that export from the component README to render the examples inline. The marker mirrors the `of={Stories.X}` convention used by `Story`/`ArgTypes`: it is resolved at build time (the `examples` export is a build-time symbol, like `getComponentDocs`), so the value never has to exist at runtime.
+Reference that export from the component README to render the examples inline. Import the `Examples` marker from the browser-safe runtime entry. It mirrors the `of={Stories.X}` convention used by `Story`/`ArgTypes`: the build plugins replace it before rendering, so the marker and the `examples` value never have to do anything at runtime.
 
 ```mdx
 <!-- button/README.mdx -->
+import { Examples } from '@bento/storybook-addon-helpers/runtime';
 import * as Stories from './button.stories.tsx';
 
 <Examples of={Stories.examples} />

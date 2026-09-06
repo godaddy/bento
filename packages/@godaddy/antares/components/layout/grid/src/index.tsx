@@ -1,7 +1,7 @@
 import { type CSSProperties, type ElementType, forwardRef } from 'react';
-import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '../../../../types/polymorphic-react.ts';
-import { composeClassName, composeStyle } from '../../../../utils/render-props.ts';
-import { Box, type BoxOwnProps } from '../../box/src/index.tsx';
+import type { PolymorphicComponent, PolymorphicProps, PolymorphicRef } from '#types/polymorphic-react.ts';
+import { composeClassName, composeStyle } from '#utils/render-props.ts';
+import { Box, type BoxOwnProps } from '#components/layout/box';
 import { toSpacingVar } from '../../tokens.ts';
 import type { SharedFlexGridProps } from '../../types.ts';
 import styles from './index.module.css';

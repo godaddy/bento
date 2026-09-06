@@ -18,7 +18,7 @@ import {
 import type { ReactElement, ReactNode } from 'react';
 import { cx } from 'cva';
 import styles from './index.module.css';
-import { composeClassName, composeStyle } from '../../../utils/render-props.ts';
+import { composeClassName, composeStyle } from '#utils/render-props.ts';
 import { Popover, type PopoverProps } from '#components/popover';
 import { Text } from '#components/text';
 import { Icon } from '#components/icon';
